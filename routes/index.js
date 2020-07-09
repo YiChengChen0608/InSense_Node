@@ -16,19 +16,20 @@ app.use(express.urlencoded({ extended: false }));
 //parse application/json
 app.use(express.json());
 
-
-
 //cors
 const whitelist = [
   undefined,
   "http://localhost:3000",
   "http://localhost:3001",
+  "http://localhost:3030",
+  "http://localhost:3002",
+  "http://localhost:3003",
   "http://127.0.0.1:5500",
 ];
 const corsOptions = {
   credentials: true,
   origin: function (origin, cb) {
-    console.log(origin);
+    // console.log(origin);
     if (whitelist.indexOf(origin) !== -1) {
       cb(null, true);
     } else {
@@ -52,7 +53,7 @@ app.use(
     saveUninitialized: false, // 是否自動儲存未初始化的會話，建議false
     resave: false, // 是否每次都重新儲存會話，建議false
     cookie: {
-      maxAge: 60000, // 1分鐘 有效期，單位是毫秒
+      maxAge: 1800000, // 30分鐘 有效期，單位是毫秒
       // domain:"localhost"
       // sameSite: false, // this may need to be false is you are accessing from another React app
       // httpOnly: false, // this must be false if you want to access the cookie
@@ -61,14 +62,35 @@ app.use(
   })
 );
 
+
 // //設定ejs路徑(暫時用不到)
 app.set("view engine", "ejs");
 app.set("views", __dirname + "/../views");
 
+// ================================== //
+//各功能路由
+//商品
+app.use("/itemlist", require(__dirname + "/itemlist"));
+app.use("/itemdetail", require(__dirname + "/itemdetail"));
+//會員
+app.use("/users", require(__dirname + "/users"));
+//課程
+app.use("/class", require(__dirname + "/class"));
+
+//訂單
+app.use("/orders", require(__dirname + "/orders"));
+//faq
+app.use('/faq', require(__dirname + '/faq'));
+
+//coupon
+app.use('/coupon', require(__dirname + '/coupon'));
+//send mail test
+app.use("/passwordissue", require(__dirname + "/passwordIssue"));
+
 //測試Post
 app.post("/echo", (req, res) => {
   // console.log(req.body)
-  console.log(db);
+  // console.log(db);
   req.session.my_var = req.session.my_var || 0;
   req.session.my_var++;
   // res.cookie("test", "test");
@@ -99,6 +121,6 @@ app.use((req, res) => {
 });
 
 //設定Port號
-app.listen(3001, function () {
+app.listen(3030, function () {
   console.log("Server Started");
 });
